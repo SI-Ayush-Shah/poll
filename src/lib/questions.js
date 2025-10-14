@@ -15,14 +15,47 @@ import { supabase } from './supabaseClient.js';
  * @returns {Promise<Question[]>}
  */
 export async function fetchQuestions() {
-  const { data, error } = await supabase
-    .from('questions')
-    .select('*')
-    .order('vote_count', { ascending: false })
-    .order('created_at', { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from('questions')
+      .select('*')
+      .order('vote_count', { ascending: false })
+      .order('created_at', { ascending: false });
 
-  if (error) throw error;
-  return data;
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
+
+    // Debug logging
+    console.log('Supabase returned data:', data, typeof data, 'isArray:', Array.isArray(data));
+
+    // Ensure we always return an array
+    if (data === null || data === undefined) {
+      console.warn('Supabase returned null/undefined, returning empty array');
+      return [];
+    }
+
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    if (typeof data === 'number') {
+      console.error('Supabase returned a number instead of array:', data);
+      return [];
+    }
+
+    if (typeof data === 'object') {
+      console.error('Supabase returned object instead of array:', data);
+      return [];
+    }
+
+    console.error('Supabase returned unexpected type:', typeof data, data);
+    return [];
+  } catch (error) {
+    console.error('Error in fetchQuestions:', error);
+    throw error;
+  }
 }
 
 /**

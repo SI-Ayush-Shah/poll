@@ -22,7 +22,6 @@ export const formatAbsolute = (iso) =>
 export function QuestionCard({
   q,
   onVote,
-  onDelete,
 }) {
   return (
     <div
@@ -52,19 +51,6 @@ export function QuestionCard({
           <span className="tabular-nums">{q.vote_count}</span>
         </button>
 
-        {onDelete && (
-          <button
-            className="hidden group-hover:inline-flex rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-700 hover:bg-red-50 hover:text-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-300"
-            onClick={() => {
-              const ok = confirm("Delete this question? This can’t be undone.");
-              if (ok) onDelete(q.uuid);
-            }}
-            aria-label="Delete question"
-            title="Delete"
-          >
-            🗑
-          </button>
-        )}
       </div>
     </div>
   );
@@ -78,24 +64,61 @@ const sorters = {
   votes: (a, b) => (b.vote_count ?? 0) - (a.vote_count ?? 0),
 };
 
-const QuestionList = ({ questions, onVote, onDelete, onAskQuestion }) => {
+const QuestionList = ({ questions, onVote, onAskQuestion }) => {
   const [q, setQ] = useState("");
-  const [sort, setSort] = useState<"newest" | "oldest" | "votes">("votes");
+  const [sort, setSort] = useState("votes");
+
+  // Debug logging
+  console.log('QuestionList received questions:', questions, typeof questions);
+
+  // Ensure questions is always an array
+  const safeQuestions = useMemo(() => {
+    // Debug logging
+    console.log('QuestionList processing questions:', questions, typeof questions);
+
+    if (!questions) {
+      console.log('Questions is falsy, returning empty array');
+      return [];
+    }
+
+    if (Array.isArray(questions)) {
+      console.log('Questions is array, length:', questions.length);
+      return questions;
+    }
+
+    if (typeof questions === 'number') {
+      console.error('Questions prop is a number, expected array:', questions);
+      return [];
+    }
+
+    if (typeof questions === 'object' && questions.length !== undefined) {
+      console.log('Questions is array-like object, converting');
+      return Array.from(questions);
+    }
+
+    console.error('Questions prop is unexpected type:', typeof questions, questions);
+    return [];
+  }, [questions]);
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
-    let list = Array.isArray(questions) ? [...questions] : [];
+
+    // Use the safe questions array
+    let list = [...safeQuestions];
+
     if (term) {
       list = list.filter(
         (x) =>
-          x.question?.toLowerCase().includes(term) ||
-          x.name?.toLowerCase().includes(term)
+          x &&
+          typeof x === 'object' &&
+          (x.question?.toLowerCase().includes(term) ||
+           x.name?.toLowerCase().includes(term))
       );
     }
     return list.sort(sorters[sort]);
-  }, [questions, q, sort]);
+  }, [safeQuestions, q, sort]);
 
-  if (!questions || questions.length === 0) {
+  if (safeQuestions.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-gray-300 bg-white p-10 text-center">
         <div className="mb-3 text-3xl">❓</div>
@@ -120,7 +143,7 @@ const QuestionList = ({ questions, onVote, onDelete, onAskQuestion }) => {
         <div>
           <h2 className="text-sm font-semibold text-gray-900">All questions</h2>
           <p className="text-xs text-gray-600">
-            {questions.length} question{questions.length !== 1 ? "s" : ""} asked
+            {safeQuestions.length} question{safeQuestions.length !== 1 ? "s" : ""} asked
           </p>
         </div>
 
@@ -171,7 +194,6 @@ const QuestionList = ({ questions, onVote, onDelete, onAskQuestion }) => {
             key={item.uuid}
             q={item}
             onVote={onVote}
-            onDelete={onDelete}
           />
         ))}
 

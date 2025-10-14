@@ -17,10 +17,32 @@ export function useQuestions(realtime = true) {
       setLoading(true);
       setErr(null);
       const data = await fetchQuestions();
-      setItems(data);
+
+      // Debug logging
+      console.log('fetchQuestions returned:', data, typeof data);
+
+      // Ensure data is always an array
+      let questionsArray = [];
+      if (Array.isArray(data)) {
+        questionsArray = data;
+      } else if (data === null || data === undefined) {
+        console.warn('fetchQuestions returned null/undefined');
+        questionsArray = [];
+      } else if (typeof data === 'number') {
+        console.error('fetchQuestions returned a number:', data);
+        questionsArray = [];
+      } else {
+        console.error('fetchQuestions returned unexpected type:', typeof data, data);
+        questionsArray = [];
+      }
+
+      console.log('Setting items to:', questionsArray, 'length:', questionsArray.length);
+      setItems(questionsArray);
     } catch (e) {
       setErr(e.message || 'Error loading questions');
       console.error('Error fetching questions:', e);
+      // Ensure items is reset to empty array on error
+      setItems([]);
     } finally {
       setLoading(false);
     }
