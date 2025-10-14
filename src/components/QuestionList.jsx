@@ -24,6 +24,8 @@ export function QuestionCard({
   q,
   onVote,
 }) {
+  const isVoted = hasVoted(q.uuid);
+
   return (
     <div
       className="group flex items-start justify-between gap-4 px-4 py-4 transition-colors hover:bg-gray-50"
@@ -44,11 +46,20 @@ export function QuestionCard({
 
       <div className="flex items-center gap-2 shrink-0">
         <button
-          className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 active:scale-[.98] transition"
-          onClick={() => onVote(q.uuid)}
-          aria-label={`Upvote. Current count ${q.vote_count}`}
+          className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm focus:outline-none focus-visible:ring-2 active:scale-[.98] transition ${
+            isVoted
+              ? "border-green-300 bg-green-50 text-green-800 cursor-default"
+              : "border-gray-300 bg-white text-gray-800 hover:bg-gray-100 focus-visible:ring-gray-300"
+          }`}
+          onClick={() => !isVoted && onVote(q.uuid)}
+          disabled={isVoted}
+          aria-label={
+            isVoted
+              ? `You have already voted. Current count ${q.vote_count}`
+              : `Upvote. Current count ${q.vote_count}`
+          }
         >
-          <span aria-hidden>👍</span>
+          <span aria-hidden>{isVoted ? "✅" : "👍"}</span>
           <span className="tabular-nums">{q.vote_count}</span>
         </button>
 

@@ -7,11 +7,13 @@ import { useQuestions } from "./hooks/useQuestions";
 function App() {
   const [showAddQuestion, setShowAddQuestion] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [notificationType, setNotificationType] = useState('success'); // 'success' or 'error'
   const { items: questions, loading, err, create, vote } = useQuestions(true);
 
   const addQuestion = async (newQuestion) => {
     await create(newQuestion.name, newQuestion.title);
     setShowAddQuestion(false);
+    setNotificationType('success');
     setNotification("Question submitted! Your question has been posted successfully.");
     setTimeout(() => setNotification(null), 3500);
   };
@@ -21,6 +23,15 @@ function App() {
       await vote(questionId);
     } catch (e) {
       console.error(e);
+      if (e.message === 'You have already voted on this question') {
+        setNotificationType('error');
+        setNotification("You've already voted on this question!");
+        setTimeout(() => setNotification(null), 3500);
+      } else {
+        setNotificationType('error');
+        setNotification("Error voting on question. Please try again.");
+        setTimeout(() => setNotification(null), 3500);
+      }
     }
   };
 
@@ -60,11 +71,27 @@ function App() {
       <main className="px-4 py-8 mx-auto max-w-3xl">
         {notification && (
           <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 fade-in">
-            <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-white px-4 py-3 shadow-sm">
-              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-green-600 text-white text-xs">✓</span>
+            <div className={`flex items-start gap-3 rounded-md border px-4 py-3 shadow-sm ${
+              notificationType === 'success'
+                ? 'border-green-200 bg-green-50'
+                : 'border-red-200 bg-red-50'
+            }`}>
+              <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-white text-xs ${
+                notificationType === 'success' ? 'bg-green-600' : 'bg-red-600'
+              }`}>
+                {notificationType === 'success' ? '✓' : '⚠'}
+              </span>
               <div>
-                <div className="text-sm font-medium text-gray-900">Question submitted</div>
-                <div className="text-xs text-gray-600">Your question has been posted successfully.</div>
+                <div className={`text-sm font-medium ${
+                  notificationType === 'success' ? 'text-green-900' : 'text-red-900'
+                }`}>
+                  {notificationType === 'success' ? 'Success' : 'Error'}
+                </div>
+                <div className={`text-xs ${
+                  notificationType === 'success' ? 'text-green-700' : 'text-red-700'
+                }`}>
+                  {notification}
+                </div>
               </div>
             </div>
           </div>
