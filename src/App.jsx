@@ -1,84 +1,77 @@
-import { useState } from 'react'
-import QuestionList from './components/QuestionList'
-import AddQuestion from './components/AddQuestion'
-import { useQuestions } from './hooks/useQuestions'
+// App.tsx
+import { useState, useMemo } from "react";
+import QuestionList from "./components/QuestionList";
+import AddQuestion from "./components/AddQuestion";
+import { useQuestions } from "./hooks/useQuestions";
 
 function App() {
-  const [showAddQuestion, setShowAddQuestion] = useState(false)
-  const [notification, setNotification] = useState(null)
-  const { items: questions, loading, err, create, remove, vote } = useQuestions(true)
+  const [showAddQuestion, setShowAddQuestion] = useState(false);
+  const [notification, setNotification] = useState(null);
+  const { items: questions, loading, err, create, remove, vote } = useQuestions(true);
 
   const addQuestion = async (newQuestion) => {
-    try {
-      await create(newQuestion.name, newQuestion.title)
-      setShowAddQuestion(false)
-      setNotification('Question submitted! Your question has been posted successfully.')
-      setTimeout(() => setNotification(null), 4000)
-    } catch (error) {
-      console.error('Error adding question:', error)
-      throw error
-    }
-  }
+    await create(newQuestion.name, newQuestion.title);
+    setShowAddQuestion(false);
+    setNotification("Question submitted! Your question has been posted successfully.");
+    setTimeout(() => setNotification(null), 3500);
+  };
 
   const voteOnQuestion = async (questionId) => {
     try {
-      await vote(questionId)
-    } catch (error) {
-      console.error('Error voting on question:', error)
+      await vote(questionId);
+    } catch (e) {
+      console.error(e);
     }
-  }
+  };
 
   const deleteQuestion = async (questionId) => {
     try {
-      await remove(questionId)
-    } catch (error) {
-      console.error('Error deleting question:', error)
+      await remove(questionId);
+    } catch (e) {
+      console.error(e);
     }
-  }
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center">
-        <div className="text-white text-xl">Loading questions...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600 text-base">Loading questions…</div>
       </div>
-    )
+    );
   }
 
   if (err) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center">
-        <div className="bg-red-50 text-red-800 px-6 py-4 rounded-lg">Error: {err}</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-red-50 text-red-800 border border-red-200 px-4 py-2 rounded-md text-sm">
+          Error: {String(err)}
+        </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-purple-800">
-      <header className="bg-gradient-to-br from-purple-600 to-purple-800 p-8 text-center">
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
-          <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-2xl">
-            💬
-          </div>
-          <h1 className="text-white text-3xl font-bold flex-1">Leadership Q&A</h1>
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b border-gray-200">
+        <div className="mx-auto max-w-3xl px-4 py-6 flex items-center justify-between">
+          <h1 className="text-gray-900 text-xl font-semibold">Leadership Q&A</h1>
           <button
-            className="bg-white/20 backdrop-blur-sm text-white border-2 border-white/30 px-6 py-3 rounded-full font-semibold hover:bg-white/30 hover:border-white/50 transition-all duration-300 hover:-translate-y-1"
+            className="inline-flex items-center rounded-md bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:bg-black/80"
             onClick={() => setShowAddQuestion(true)}
           >
-            Ask Question
+            Ask question
           </button>
         </div>
       </header>
 
-      <main className="p-8 max-w-4xl mx-auto">
+      <main className="px-4 py-8 mx-auto max-w-3xl">
         {notification && (
-          <div className="fixed top-8 right-8 bg-white rounded-xl shadow-lg p-4 z-50 animate-slide-in">
-            <div className="flex items-center gap-3">
-              <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                ✓
-              </span>
+          <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 fade-in">
+            <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-white px-4 py-3 shadow-sm">
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-green-600 text-white text-xs">✓</span>
               <div>
-                <div className="font-semibold text-green-800">Question submitted!</div>
-                <div className="text-sm text-gray-600">Your question has been posted successfully.</div>
+                <div className="text-sm font-medium text-gray-900">Question submitted</div>
+                <div className="text-xs text-gray-600">Your question has been posted successfully.</div>
               </div>
             </div>
           </div>
@@ -99,7 +92,7 @@ function App() {
         )}
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
