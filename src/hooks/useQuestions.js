@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { fetchQuestions, addQuestion, deleteQuestion, upvote } from '../lib/questions.js';
+import { fetchQuestions, addQuestion, upvote } from '../lib/questions.js';
 import { supabase } from '../lib/supabaseClient.js';
 
 /**
@@ -82,16 +82,6 @@ export function useQuestions(realtime = true) {
         return newQuestion;
       } catch (e) {
         setErr(e.message || 'Error creating question');
-        throw e;
-      }
-    },
-    async remove(uuid) {
-      try {
-        await deleteQuestion(uuid);
-        setItems(prev => prev.filter(x => x.uuid !== uuid));
-        return true;
-      } catch (e) {
-        setErr(e.message || 'Error deleting question');
         throw e;
       }
     },

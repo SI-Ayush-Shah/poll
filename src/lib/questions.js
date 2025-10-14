@@ -75,28 +75,30 @@ export async function addQuestion(name, question) {
   return data;
 }
 
-/**
- * Delete a question by UUID
- * @param {string} uuid - The question UUID
- * @returns {Promise<boolean>}
- */
-export async function deleteQuestion(uuid) {
-  const { error } = await supabase
-    .from('questions')
-    .delete()
-    .eq('uuid', uuid);
-
-  if (error) throw error;
-  return true;
-}
 
 /**
- * Upvote a question (atomic operation via RPC)
+ * Upvote a question
  * @param {string} uuid - The question UUID
  * @returns {Promise<Question>} - The updated question object
  */
 export async function upvote(uuid) {
-  const { data, error } = await supabase.rpc('increment_vote', { q_uuid: uuid });
-  if (error) throw error;
-  return data; // function returns the updated row
+  // Fetch current question
+  const { data: currentQuestion, error: fetchError } = await supabase
+    .from('questions')
+    .select('*')
+    .eq('uuid', uuid)
+    .single();
+
+  if (fetchError) throw fetchError;
+
+  // Update vote count
+  const { data, error: updateError } = await supabase
+    .from('questions')
+    .update({ vote_count: (currentQuestion.vote_count || 0) + 1 })
+    .eq('uuid', uuid)
+    .select()
+    .single();
+
+  if (updateError) throw updateError;
+  return data;
 }

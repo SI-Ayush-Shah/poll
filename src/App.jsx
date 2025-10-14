@@ -7,7 +7,7 @@ import { useQuestions } from "./hooks/useQuestions";
 function App() {
   const [showAddQuestion, setShowAddQuestion] = useState(false);
   const [notification, setNotification] = useState(null);
-  const { items: questions, loading, err, create, remove, vote } = useQuestions(true);
+  const { items: questions, loading, err, create, vote } = useQuestions(true);
 
   const addQuestion = async (newQuestion) => {
     await create(newQuestion.name, newQuestion.title);
@@ -24,13 +24,6 @@ function App() {
     }
   };
 
-  const deleteQuestion = async (questionId) => {
-    try {
-      await remove(questionId);
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   if (loading) {
     return (
@@ -86,7 +79,6 @@ function App() {
           <QuestionList
             questions={questions}
             onVote={voteOnQuestion}
-            onDelete={deleteQuestion}
             onAskQuestion={() => setShowAddQuestion(true)}
           />
         )}
