@@ -27,7 +27,6 @@ const AddQuestion = ({ onAddQuestion, onCancel }) => {
 
   const validate = () => {
     const e = {};
-    if (!name.trim()) e.name = "Please add your name.";
     if (!question.trim()) e.question = "Please write a question.";
     if (question.trim().length < 10) e.question = "Question should be at least 10 characters.";
     setErrors(e);
@@ -109,7 +108,7 @@ const AddQuestion = ({ onAddQuestion, onCancel }) => {
           <div className="mb-4">
             <div className="mb-1 flex items-center justify-between">
               <label htmlFor="question-name" className="text-xs font-medium text-gray-700">
-                Your name
+                Your name <span className="text-gray-400">(optional)</span>
               </label>
               <span className="text-[11px] text-gray-400">
                 {name.length}/{MAX_NAME}
@@ -124,7 +123,7 @@ const AddQuestion = ({ onAddQuestion, onCancel }) => {
                 setName(e.target.value);
                 if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
               }}
-              placeholder="Jane Doe"
+              placeholder="Jane Doe (or leave blank for Anonymous)"
               maxLength={MAX_NAME}
               className={`w-full rounded-lg border bg-white px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-gray-400 focus:ring-2 focus:ring-gray-200 ${
                 errors.name ? "border-red-300" : "border-gray-300"

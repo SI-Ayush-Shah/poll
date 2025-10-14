@@ -102,14 +102,17 @@ export async function fetchQuestions() {
 
 /**
  * Add a new question
- * @param {string} name - The name of the person asking
+ * @param {string} name - The name of the person asking (optional, defaults to "Anonymous")
  * @param {string} question - The question text
  * @returns {Promise<Question>}
  */
 export async function addQuestion(name, question) {
+  // Use "Anonymous" if no name is provided or name is empty
+  const finalName = (!name || name.trim() === '') ? 'Anonymous' : name.trim();
+
   const { data, error } = await supabase
     .from('questions')
-    .insert({ name, question })
+    .insert({ name: finalName, question })
     .select()
     .single();
 
