@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { hasVoted } from "../lib/questions.js";
 // utils/timeAgo.ts
 export const formatTimeAgo = (iso) => {
   const created = new Date(iso);
@@ -68,31 +69,24 @@ const QuestionList = ({ questions, onVote, onAskQuestion }) => {
   const [q, setQ] = useState("");
   const [sort, setSort] = useState("votes");
 
-  // Debug logging
-  console.log('QuestionList received questions:', questions, typeof questions);
 
   // Ensure questions is always an array
   const safeQuestions = useMemo(() => {
     // Debug logging
-    console.log('QuestionList processing questions:', questions, typeof questions);
 
     if (!questions) {
-      console.log('Questions is falsy, returning empty array');
       return [];
     }
 
     if (Array.isArray(questions)) {
-      console.log('Questions is array, length:', questions.length);
       return questions;
     }
 
     if (typeof questions === 'number') {
-      console.error('Questions prop is a number, expected array:', questions);
       return [];
     }
 
     if (typeof questions === 'object' && questions.length !== undefined) {
-      console.log('Questions is array-like object, converting');
       return Array.from(questions);
     }
 

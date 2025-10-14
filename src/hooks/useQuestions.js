@@ -18,8 +18,6 @@ export function useQuestions(realtime = true) {
       setErr(null);
       const data = await fetchQuestions();
 
-      // Debug logging
-      console.log('fetchQuestions returned:', data, typeof data);
 
       // Ensure data is always an array
       let questionsArray = [];
@@ -36,7 +34,6 @@ export function useQuestions(realtime = true) {
         questionsArray = [];
       }
 
-      console.log('Setting items to:', questionsArray, 'length:', questionsArray.length);
       setItems(questionsArray);
     } catch (e) {
       setErr(e.message || 'Error loading questions');

@@ -1,5 +1,48 @@
 import { supabase } from './supabaseClient.js';
 
+// LocalStorage key for storing voted questions
+const VOTED_QUESTIONS_KEY = 'voted_questions';
+
+/**
+ * Get the list of question IDs that the current user has voted on
+ * @returns {string[]} Array of question UUIDs that have been voted on
+ */
+export function getVotedQuestions() {
+  try {
+    const stored = localStorage.getItem(VOTED_QUESTIONS_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error('Error reading voted questions from localStorage:', error);
+    return [];
+  }
+}
+
+/**
+ * Check if the current user has voted on a specific question
+ * @param {string} uuid - The question UUID
+ * @returns {boolean} True if the user has voted on this question
+ */
+export function hasVoted(uuid) {
+  const votedQuestions = getVotedQuestions();
+  return votedQuestions.includes(uuid);
+}
+
+/**
+ * Mark a question as voted by the current user
+ * @param {string} uuid - The question UUID
+ */
+export function markQuestionAsVoted(uuid) {
+  try {
+    const votedQuestions = getVotedQuestions();
+    if (!votedQuestions.includes(uuid)) {
+      votedQuestions.push(uuid);
+      localStorage.setItem(VOTED_QUESTIONS_KEY, JSON.stringify(votedQuestions));
+    }
+  } catch (error) {
+    console.error('Error saving voted question to localStorage:', error);
+  }
+}
+
 // Note: In JavaScript, we use JSDoc for type hints
 /**
  * @typedef {Object} Question
@@ -28,7 +71,6 @@ export async function fetchQuestions() {
     }
 
     // Debug logging
-    console.log('Supabase returned data:', data, typeof data, 'isArray:', Array.isArray(data));
 
     // Ensure we always return an array
     if (data === null || data === undefined) {
@@ -80,8 +122,14 @@ export async function addQuestion(name, question) {
  * Upvote a question
  * @param {string} uuid - The question UUID
  * @returns {Promise<Question>} - The updated question object
+ * @throws {Error} If the user has already voted on this question
  */
 export async function upvote(uuid) {
+  // Check if user has already voted
+  if (hasVoted(uuid)) {
+    throw new Error('You have already voted on this question');
+  }
+
   // Fetch current question
   const { data: currentQuestion, error: fetchError } = await supabase
     .from('questions')
@@ -100,5 +148,9 @@ export async function upvote(uuid) {
     .single();
 
   if (updateError) throw updateError;
+
+  // Mark question as voted in localStorage
+  markQuestionAsVoted(uuid);
+
   return data;
 }
