@@ -101,7 +101,7 @@ const AddQuestion = ({ onAddQuestion, onCancel }) => {
           )}
 
           <p id={descId} className="mb-4 text-sm text-gray-500">
-            Keep it clear and concise. You can edit later if needed.
+            Keep it clear and concise.
           </p>
 
           {/* Name */}
