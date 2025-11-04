@@ -23,6 +23,7 @@ export const formatAbsolute = (iso) =>
 export function QuestionCard({
   q,
   onVote,
+  pollEnded,
 }) {
   const isVoted = hasVoted(q.uuid);
 
@@ -47,19 +48,23 @@ export function QuestionCard({
       <div className="flex items-center gap-2 shrink-0">
         <button
           className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm focus:outline-none focus-visible:ring-2 active:scale-[.98] transition ${
-            isVoted
+            pollEnded
+              ? "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
+              : isVoted
               ? "border-green-300 bg-green-50 text-green-800 cursor-default"
               : "border-gray-300 bg-white text-gray-800 hover:bg-gray-100 focus-visible:ring-gray-300"
           }`}
-          onClick={() => !isVoted && onVote(q.uuid)}
-          disabled={isVoted}
+          onClick={() => !pollEnded && !isVoted && onVote(q.uuid)}
+          disabled={pollEnded || isVoted}
           aria-label={
-            isVoted
+            pollEnded
+              ? `Poll has ended. Current count ${q.vote_count}`
+              : isVoted
               ? `You have already voted. Current count ${q.vote_count}`
               : `Upvote. Current count ${q.vote_count}`
           }
         >
-          <span aria-hidden>{isVoted ? "✅" : "👍"}</span>
+          <span aria-hidden>{pollEnded ? "🚫" : isVoted ? "✅" : "👍"}</span>
           <span className="tabular-nums">{q.vote_count}</span>
         </button>
 
@@ -76,7 +81,7 @@ const sorters = {
   votes: (a, b) => (b.vote_count ?? 0) - (a.vote_count ?? 0),
 };
 
-const QuestionList = ({ questions, onVote, onAskQuestion }) => {
+const QuestionList = ({ questions, onVote, onAskQuestion, pollEnded }) => {
   const [q, setQ] = useState("");
   const [sort, setSort] = useState("votes");
 
@@ -184,8 +189,13 @@ const QuestionList = ({ questions, onVote, onAskQuestion }) => {
           </select>
 
           <button
-            className="hidden sm:inline-flex items-center rounded-md bg-gray-900 text-white px-3.5 py-2 text-sm font-medium hover:bg-black/80"
-            onClick={onAskQuestion}
+            className={`hidden sm:inline-flex items-center rounded-md px-3.5 py-2 text-sm font-medium ${
+              pollEnded
+                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                : 'bg-gray-900 text-white hover:bg-black/80'
+            }`}
+            onClick={() => !pollEnded && onAskQuestion()}
+            disabled={pollEnded}
           >
             Ask question
           </button>
@@ -199,6 +209,7 @@ const QuestionList = ({ questions, onVote, onAskQuestion }) => {
             key={item.uuid}
             q={item}
             onVote={onVote}
+            pollEnded={pollEnded}
           />
         ))}
 

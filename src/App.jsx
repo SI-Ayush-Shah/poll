@@ -8,9 +8,17 @@ function App() {
   const [showAddQuestion, setShowAddQuestion] = useState(false);
   const [notification, setNotification] = useState(null);
   const [notificationType, setNotificationType] = useState('success'); // 'success' or 'error'
+  const [pollEnded, setPollEnded] = useState(true); // Set to true to disable all functionality
   const { items: questions, loading, err, create, vote } = useQuestions(true);
 
   const addQuestion = async (newQuestion) => {
+    if (pollEnded) {
+      setNotificationType('error');
+      setNotification("Poll has ended. You cannot add new questions.");
+      setTimeout(() => setNotification(null), 3500);
+      return;
+    }
+
     await create(newQuestion.name, newQuestion.title);
     setShowAddQuestion(false);
     setNotificationType('success');
@@ -19,6 +27,13 @@ function App() {
   };
 
   const voteOnQuestion = async (questionId) => {
+    if (pollEnded) {
+      setNotificationType('error');
+      setNotification("Poll has ended. You cannot vote on questions.");
+      setTimeout(() => setNotification(null), 3500);
+      return;
+    }
+
     try {
       await vote(questionId);
     } catch (e) {
@@ -58,10 +73,20 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
         <div className="mx-auto max-w-3xl px-4 py-6 flex items-center justify-between">
-          <h1 className="text-gray-900 text-xl font-semibold">Leadership Q&A</h1>
+          <div>
+            <h1 className="text-gray-900 text-xl font-semibold">Leadership Q&A</h1>
+            {pollEnded && (
+              <p className="text-red-600 text-sm font-medium mt-1">Poll has ended</p>
+            )}
+          </div>
           <button
-            className="inline-flex items-center rounded-md bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:bg-black/80"
-            onClick={() => setShowAddQuestion(true)}
+            className={`inline-flex items-center rounded-md px-4 py-2 text-sm font-medium ${
+              pollEnded
+                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                : 'bg-gray-900 text-white hover:bg-black/80'
+            }`}
+            onClick={() => !pollEnded && setShowAddQuestion(true)}
+            disabled={pollEnded}
           >
             Ask question
           </button>
@@ -69,6 +94,16 @@ function App() {
       </header>
 
       <main className="px-4 py-8 mx-auto max-w-3xl">
+        {pollEnded && (
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-6 text-center">
+            <div className="text-4xl mb-2">🚫</div>
+            <h2 className="text-lg font-semibold text-red-900 mb-2">Poll has ended</h2>
+            <p className="text-sm text-red-700">
+              This poll is now closed. You can no longer add questions or vote.
+            </p>
+          </div>
+        )}
+
         {notification && (
           <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 fade-in">
             <div className={`flex items-start gap-3 rounded-md border px-4 py-3 shadow-sm ${
@@ -107,6 +142,7 @@ function App() {
             questions={questions}
             onVote={voteOnQuestion}
             onAskQuestion={() => setShowAddQuestion(true)}
+            pollEnded={pollEnded}
           />
         )}
       </main>
