@@ -8,7 +8,7 @@ function App() {
   const [showAddQuestion, setShowAddQuestion] = useState(false);
   const [notification, setNotification] = useState(null);
   const [notificationType, setNotificationType] = useState('success'); // 'success' or 'error'
-  const [pollEnded, setPollEnded] = useState(true); // Set to true to disable all functionality
+  const [pollEnded, setPollEnded] = useState(false); // Set to true to disable all functionality
   const { items: questions, loading, err, create, vote } = useQuestions(true);
 
   const addQuestion = async (newQuestion) => {
