@@ -74,7 +74,7 @@ function App() {
       <header className="bg-white border-b border-gray-200">
         <div className="mx-auto max-w-3xl px-4 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-gray-900 text-xl font-semibold">Leadership Q&A</h1>
+            <h1 className="text-gray-900 text-xl font-semibold">Surface Leadership Q&A</h1>
             {pollEnded && (
               <p className="text-red-600 text-sm font-medium mt-1">Poll has ended</p>
             )}
