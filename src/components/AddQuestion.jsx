@@ -28,7 +28,7 @@ const AddQuestion = ({ onAddQuestion, onCancel }) => {
   const validate = () => {
     const e = {};
     if (!question.trim()) e.question = "Please write a question.";
-    if (question.trim().length < 10) e.question = "Question should be at least 10 characters.";
+    else if (question.trim().length < 10) e.question = "Question should be at least 10 characters.";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -72,23 +72,23 @@ const AddQuestion = ({ onAddQuestion, onCancel }) => {
       aria-modal="true"
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] animate-in fade-in" />
+      <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm animate-fade-in" />
 
       {/* Card */}
       <div
         ref={dialogRef}
-        className="relative w-full max-w-lg rounded-2xl border border-gray-200 bg-white shadow-xl animate-in zoom-in-95 slide-in-from-top-2"
+        className="relative w-full max-w-lg rounded-2xl border border-slate-200 bg-white shadow-2xl animate-pop-in"
       >
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-5 py-4">
-          <h2 id={labelId} className="text-base font-semibold text-gray-900">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
+          <h2 id={labelId} className="text-base font-semibold text-slate-900">
             Ask a question
           </h2>
           <button
             type="button"
             onClick={onCancel}
             aria-label="Close"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
           >
             ×
           </button>
@@ -97,20 +97,20 @@ const AddQuestion = ({ onAddQuestion, onCancel }) => {
         {/* Body */}
         <form onSubmit={handleSubmit} className="px-5 py-4">
           {errors.form && (
-            <p className="mb-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{errors.form}</p>
+            <p className="mb-3 rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700">{errors.form}</p>
           )}
 
-          <p id={descId} className="mb-4 text-sm text-gray-500">
+          <p id={descId} className="mb-4 text-sm text-slate-500">
             Keep it clear and concise.
           </p>
 
           {/* Name */}
           <div className="mb-4">
             <div className="mb-1 flex items-center justify-between">
-              <label htmlFor="question-name" className="text-xs font-medium text-gray-700">
-                Your name <span className="text-gray-400">(optional)</span>
+              <label htmlFor="question-name" className="text-xs font-medium text-slate-700">
+                Your name <span className="text-slate-400">(optional)</span>
               </label>
-              <span className="text-[11px] text-gray-400">
+              <span className="text-[11px] text-slate-400">
                 {name.length}/{MAX_NAME}
               </span>
             </div>
@@ -125,14 +125,14 @@ const AddQuestion = ({ onAddQuestion, onCancel }) => {
               }}
               placeholder="Jane Doe (or leave blank for Anonymous)"
               maxLength={MAX_NAME}
-              className={`w-full rounded-lg border bg-white px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-gray-400 focus:ring-2 focus:ring-gray-200 ${
-                errors.name ? "border-red-300" : "border-gray-300"
+              className={`w-full rounded-lg border bg-white px-3 py-2 text-sm outline-none placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 ${
+                errors.name ? "border-rose-300" : "border-slate-300"
               }`}
               aria-invalid={!!errors.name}
               aria-describedby={errors.name ? "name-error" : undefined}
             />
             {errors.name && (
-              <p id="name-error" className="mt-1 text-xs text-red-600">
+              <p id="name-error" className="mt-1 text-xs text-rose-600">
                 {errors.name}
               </p>
             )}
@@ -141,10 +141,10 @@ const AddQuestion = ({ onAddQuestion, onCancel }) => {
           {/* Question */}
           <div className="mb-5">
             <div className="mb-1 flex items-center justify-between">
-              <label htmlFor="question-text" className="text-xs font-medium text-gray-700">
+              <label htmlFor="question-text" className="text-xs font-medium text-slate-700">
                 Your question
               </label>
-              <span className="text-[11px] text-gray-400">
+              <span className="text-[11px] text-slate-400">
                 {question.length}/{MAX_Q}
               </span>
             </div>
@@ -159,42 +159,42 @@ const AddQuestion = ({ onAddQuestion, onCancel }) => {
                 placeholder="What would you like to ask?"
                 maxLength={MAX_Q}
                 rows={5}
-                className={`w-full resize-y rounded-lg border bg-white px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-gray-400 focus:ring-2 focus:ring-gray-200 ${
-                  errors.question ? "border-red-300" : "border-gray-300"
+                className={`w-full resize-y rounded-lg border bg-white px-3 py-2 text-sm outline-none placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 ${
+                  errors.question ? "border-rose-300" : "border-slate-300"
                 }`}
+                onKeyDown={(e) => {
+                  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                    e.preventDefault();
+                    e.currentTarget.form?.requestSubmit();
+                  }
+                }}
                 aria-invalid={!!errors.question}
                 aria-describedby={errors.question ? "question-error" : undefined}
               />
               {/* Soft hint */}
-              <div className="pointer-events-none absolute bottom-2 right-2 text-[11px] text-gray-400">
-                Press ⌘/Ctrl + Enter
+              <div className="pointer-events-none absolute bottom-2 right-2 rounded bg-white/80 px-1 text-[11px] text-slate-400">
+                ⌘/Ctrl + Enter to submit
               </div>
             </div>
             {errors.question && (
-              <p id="question-error" className="mt-1 text-xs text-red-600">
+              <p id="question-error" className="mt-1 text-xs text-rose-600">
                 {errors.question}
               </p>
             )}
           </div>
 
           {/* Footer */}
-          <div className="flex flex-wrap items-center justify-end gap-2 border-t border-gray-100 pt-4">
+          <div className="flex flex-wrap items-center justify-end gap-2 border-t border-slate-100 pt-4">
             <button
               type="button"
-              className="rounded-lg border border-gray-300 px-3.5 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+              className="rounded-lg border border-slate-300 px-3.5 py-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
               onClick={onCancel}
             >
               Cancel
             </button>
             <button
               type="submit"
-              onKeyDown={(e) => {
-                if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "enter") {
-                  e.preventDefault();
-                  e.currentTarget.form?.requestSubmit();
-                }
-              }}
-              className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black/85 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 disabled:opacity-60"
               disabled={isSubmitting}
             >
               {isSubmitting ? (

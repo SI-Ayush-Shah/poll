@@ -34,8 +34,8 @@ export function useQuestions(realtime = true) {
         questionsArray = [];
       }
 
-      // Filter questions to only show those created on or after December 12th, 2025
-      const cutoffDate = new Date('2026-10-03T00:00:00');
+      // Only show questions created on or after this date (poll restart point)
+      const cutoffDate = new Date('2026-11-26T00:00:00');
       const filteredQuestions = questionsArray.filter(question => {
         const createdAt = new Date(question.created_at);
         return createdAt >= cutoffDate;
